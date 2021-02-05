@@ -1,0 +1,96 @@
+datatype TN = T of string | N of int
+
+Ahora podemos tener (embebidos) numeros y strings en listas. Podemos simular tablas de tyokas de atributos mediante listas de listas de TN.
+
+.Ejercicio 1
+Previo a resolver el prolema de abuelos/nietos y el problema de bebedores de cerveza, deberan adaptar la funcion prod (producto cartesiano), para multiplicar mas de dos listas.
+	prod(L1, prod(L2,L3))
+	
+	fun prodCart (xs,ys) =
+		List.foldr(fn(x,pairs)=>
+			List.foldr(fn(y,L)=>(x@y)::L)
+				pairs ys)
+{*
+	fun foldr _ i [] = i
+	| foldr f i (h::t) = f(h, foldr f i t);
+*}
+
+.Ejercicio 2: Hacer una funcion 
+	proy = int list * 'a list -> 'a list	//Que elementos deben quedar (empieza con 0)
+	
+	proy = ([1,2], [10,20,30,40]) -> [20,40] 
+	
+	Hint: List.nth y map (hacer help "List";)
+	[nth(xs, i)] returns the i'th element of xs, counting from 0.
+	Raises Subscript if i<0 or i>=length xs.
+	
+	fun proy [] _ = []
+	| proy (h::t) l = (map (fn x => [List.nth(x, h)]) l)::(proy t l);
+	
+	fun prog [] _ = []
+	| prog (h::t) xs = (List.nth (xs, h))::(prog t xs);
+	
+	fun proy _ [] = []
+	| proy l (h::t) = map (List.nth (g t) l);
+	
+	fun Proy(il, ll) = map (fn l => map (fn i => List.nth(l, i)) il) ll
+	
+Cez TRY...
+       fun proy [] _ = []
+       | proy (h::t) l = (map (fn x => [List.nth(x, h)]) l)::(proy t l);
+> val 'a proy = fn : int list -> 'a list list -> 'a list list list
+- proy [1,2] [10,20,30,40];
+! Toplevel input:
+! proy [1,2] [10,20,30,40];
+!             ^^
+! Type clash: expression of type
+!   int
+! cannot have type
+!   'a list
+
+-       fun proy [] _ = []
+        | proy (h::t) l = (map (fn x => [List.nth(x, h)]) l)::(proy t l);
+> val 'a proy = fn : int list -> 'a list list -> 'a list list list
+- proy [0,2,3] [[1,2,3,4],[5,6,7,8], [9,10,11,12]];
+> val it = [[[1], [5], [9]], [[3], [7], [11]], [[4], [8], [12]]] :
+  int list list list
+
+- fun Proy il l = map (fn i => List.nth(l, i)) il;
+> val 'a Proy = fn : int list -> 'a list -> 'a list
+- Proy [1,2] [1,2,3,4];
+> val it = [2, 3] : int list
+- fun Proy il ll = map (fn l => map (fn i => List.nth(l, i)) il) ll;
+> val 'a Proy = fn : int list -> 'a list list -> 'a list list
+
+- fun Proy(il, ll) = map (fn l => map (fn i => List.nth(l, i)) il) ll;
+> val 'a Proy = fn : int list * 'a list list -> 'a list list
+
+Transformacion de Funciones...
+
+- fun curry f = fn x => fn y => f(x, y);
+> val ('a, 'b, 'c) curry = fn : ('a * 'b -> 'c) -> 'a -> 'b -> 'c
+- val x = curry op+;
+> val x = fn : int -> int -> int
+- x 3;
+> val it = fn : int -> int
+- it 4;
+> val it = 7 : int
+- op+(3, 4);
+> val it = 7 : int
+- fun uncurry f = fn(x, y) => f x y;
+> val ('a, 'b, 'c) uncurry = fn : ('a -> 'b -> 'c) -> 'a * 'b -> 'c
+- uncurry x;
+> val it = fn : int * int -> int
+
+- val y = uncurry x;
+> val y = fn : int * int -> int
+- y 3;
+! Toplevel input:
+! y 3;
+!   ^
+! Type clash: expression of type
+!   int
+! cannot have type
+!   int * int
+- y(3, 4);
+> val it = 7 : int
